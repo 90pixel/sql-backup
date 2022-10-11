@@ -103,16 +103,6 @@ def backup_mysql(_host="", _user="", _password="", _database=""):
         compresscmd = "gzip " + backup_file
         os.system(compresscmd)
 
-        # If OS is Windows delete last 3 days
-        if os.name == 'nt':
-            os.system("forfiles /P " + backup_dir + " /M *.* /D -3 /C \"cmd /c del @path\"")
-            # remove sql files
-            os.system("forfiles /P " + backup_dir + " /M *.sql /C \"cmd /c del @path\"")
-        else:
-            os.system("find " + backup_dir + " -type f -mtime +3 -exec rm {} \;")
-            # remove sql files
-            os.system("find " + backup_dir + " -type f -name '*.sql' -exec rm {} \;")
-
     except Exception as e:
         print(e)
 
@@ -143,16 +133,6 @@ def backup_mssql(_host="", _user="", _password="", _database=""):
         compresscmd = "gzip " + backup_file
         os.system(compresscmd)
 
-        # If OS is Windows delete last 3 days
-        if os.name == 'nt':
-            os.system("forfiles /P " + backup_dir + " /M *.* /D -3 /C \"cmd /c del @path\"")
-            # remove bak files
-            os.system("forfiles /P " + backup_dir + " /M *.bak /C \"cmd /c del @path\"")
-        else:
-            os.system("find " + backup_dir + " -type f -mtime +3 -exec rm {} \;")
-            # remove bak files
-            os.system("find " + backup_dir + " -type f -name '*.bak' -exec rm {} \;")
-
     except Exception as e:
         print(e)
 
@@ -179,16 +159,6 @@ def backup_postgresql(_host="", _user="", _password="", _database=""):
         # Compress SQL file
         compresscmd = "gzip " + backup_file
         os.system(compresscmd)
-
-        # If OS is Windows delete last 3 days
-        if os.name == 'nt':
-            os.system("forfiles /P " + backup_dir + " /M *.* /D -3 /C \"cmd /c del @path\"")
-            # remove sql files
-            os.system("forfiles /P " + backup_dir + " /M *.sql /C \"cmd /c del @path\"")
-        else:
-            os.system("find " + backup_dir + " -type f -mtime +3 -exec rm {} \;")
-            # remove sql files
-            os.system("find " + backup_dir + " -type f -name '*.sql' -exec rm {} \;")
 
     except Exception as e:
         print(e)
@@ -248,6 +218,19 @@ def test_postgresql_connection(_host="", _user="", _password="", _database=""):
         print("Test connection failed")
         exit()
     print("Test connection success")
+
+
+# REMOVE OLD FILES
+def remove_old_files():
+    # If OS is Windows delete last 3 days
+    if os.name == 'nt':
+        os.system("forfiles /P " + backup_dir + " /M *.* /D -3 /C \"cmd /c del @path\"")
+        # remove sql files
+        os.system("forfiles /P " + backup_dir + " /M *.sql /C \"cmd /c del @path\"")
+    else:
+        os.system("find " + backup_dir + " -type f -mtime +3 -exec rm {} \;")
+        # remove sql files
+        os.system("find " + backup_dir + " -type f -name '*.sql' -exec rm {} \;")
 
 
 # CHECK DEPENDENCIES postgreSQL
@@ -368,6 +351,8 @@ def take_all_backups():
                     print("Unknown type: " + p['type'])
                     continue
     print("All backups completed")
+    # remove old not compressed files
+    remove_old_files()
     print("Start to upload backups")
     upload_to_digitalocean_spaces()
 
