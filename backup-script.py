@@ -418,7 +418,7 @@ def select_menu():
         select_menu()
     elif option == "2":
         print_all_configs()
-        order_number = input("Remove line number: ")
+        order_number = input("Remove by line number: ")
         remove_from_config_file(order_number)
         select_menu()
     elif option == "3":
