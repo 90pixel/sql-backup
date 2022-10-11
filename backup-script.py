@@ -120,6 +120,7 @@ def backup_mssql(_host="", _user="", _password="", _database=""):
         # Create backup file
         backup_file = backup_dir + _database + time.strftime("%Y%m%d-%H%M%S") + ".bak"
 
+        print("Backing up " + backup_file + " database...")
         # if _host is not set
         if _host == "":
             _host = "localhost"
@@ -131,9 +132,12 @@ def backup_mssql(_host="", _user="", _password="", _database=""):
             dumpcmd = "sqlcmd -S " + _host + " -Q \"BACKUP DATABASE " + _database + " TO DISK = '" + backup_file + "'\""
         os.system(dumpcmd)
 
+        print("Backup done")
         # Compress SQL file
         compresscmd = "gzip " + backup_file
         os.system(compresscmd)
+
+        print("Compress done")
 
     except Exception as e:
         print(e)
