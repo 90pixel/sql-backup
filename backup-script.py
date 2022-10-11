@@ -6,10 +6,10 @@ import time
 from spaces import Client
 
 # CONSTANTS
-backup_dir = "/home/backup-sql/"
+backup_dir = "/home/90px-backup/"
 # IF OS IS WINDOWS BACKUP DIR IS DIFFERENT
 if os.name == 'nt':
-    backup_dir = "C:\\backup-sql\\"
+    backup_dir = "C:\\90px-backup\\"
 config_file = "config.json"
 do_config_file = "do_config.json"
 
