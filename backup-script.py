@@ -360,7 +360,7 @@ def take_all_backups():
                         continue
         print("All backups completed")
         # remove old not compressed files
-        remove_old_files()
+        # remove_old_files()
         print("Start to upload backups")
         upload_to_digitalocean_spaces()
     except Exception as e:
