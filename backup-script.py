@@ -327,41 +327,46 @@ def add_backup_arguments_to_config_file(_host, _user, _password, _database, _typ
 
 # READ ALL BACKUP ARGUMENTS FROM CONFIG FILE
 def take_all_backups():
-    # Check if config file exists
-    if not os.path.exists(config_file):
-        print("Config file not found")
+    try:
+        # Check if config file exists
+        if not os.path.exists(config_file):
+            print("Config file not found")
+            exit()
+        else:
+            # Read config file
+            with open(config_file) as json_file:
+                data = json.load(json_file)
+                # Loop through all backup arguments
+                for p in data:
+                    # If type is mysql
+                    if p['type'] == "mysql":
+                        # Backup mysql
+                        print(p['database'] + " backup started")
+                        backup_mysql(p['host'], p['user'], p['password'], p['database'])
+                        print(p['database'] + " backup finished")
+                    # If type is mssql
+                    elif p['type'] == "mssql":
+                        # Backup mssql
+                        print(p['database'] + " backup started")
+                        backup_mssql(p['host'], p['user'], p['password'], p['database'])
+                        print(p['database'] + " backup finished")
+                    elif p['type'] == "postgresql":
+                        # Backup postgresql
+                        print(p['database'] + " backup started")
+                        backup_postgresql(p['host'], p['user'], p['password'], p['database'])
+                        print(p['database'] + " backup finished")
+                    else:
+                        print("Unknown type: " + p['type'])
+                        continue
+        print("All backups completed")
+        # remove old not compressed files
+        remove_old_files()
+        print("Start to upload backups")
+        upload_to_digitalocean_spaces()
+    except Exception as e:
+        print(e)
+        print("Error: Something went wrong")
         exit()
-    else:
-        # Read config file
-        with open(config_file) as json_file:
-            data = json.load(json_file)
-            # Loop through all backup arguments
-            for p in data:
-                # If type is mysql
-                if p['type'] == "mysql":
-                    # Backup mysql
-                    print(p['database'] + " backup started")
-                    backup_mysql(p['host'], p['user'], p['password'], p['database'])
-                    print(p['database'] + " backup finished")
-                # If type is mssql
-                elif p['type'] == "mssql":
-                    # Backup mssql
-                    print(p['database'] + " backup started")
-                    backup_mssql(p['host'], p['user'], p['password'], p['database'])
-                    print(p['database'] + " backup finished")
-                elif p['type'] == "postgresql":
-                    # Backup postgresql
-                    print(p['database'] + " backup started")
-                    backup_postgresql(p['host'], p['user'], p['password'], p['database'])
-                    print(p['database'] + " backup finished")
-                else:
-                    print("Unknown type: " + p['type'])
-                    continue
-    print("All backups completed")
-    # remove old not compressed files
-    remove_old_files()
-    print("Start to upload backups")
-    upload_to_digitalocean_spaces()
 
 
 # Print all configs with order number in config file
