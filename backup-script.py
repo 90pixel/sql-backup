@@ -6,7 +6,7 @@ import time
 from spaces import Client
 
 # CONSTANTS
-backup_dir = "/home/90px-backup/"
+backup_dir = "/home/90px-backup/backups/"
 # IF OS IS WINDOWS BACKUP DIR IS DIFFERENT
 if os.name == 'nt':
     backup_dir = "C:\\90px-backup\\"
@@ -75,7 +75,7 @@ def upload_to_digitalocean_spaces():
                 # remove file
                 os.remove(backup_dir + file)
     except Exception as e:
-        print(" Error uploading to DigitalOcean Spaces")
+        print("Error uploading to DigitalOcean Spaces")
         print(e)
 
 
@@ -360,7 +360,7 @@ def take_all_backups():
                         continue
         print("All backups completed")
         # remove old not compressed files
-        # remove_old_files()
+        remove_old_files()
         print("Start to upload backups")
         upload_to_digitalocean_spaces()
     except Exception as e:
