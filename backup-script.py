@@ -405,7 +405,8 @@ def select_menu():
     print("1. Add Sql Backup Task")
     print("2. Remove Sql Backup Task")
     print("3. Start Backup Now")
-    print("4. Exit")
+    print("4. List All Backup Tasks")
+    print("5. Exit")
     option = input("Option: ")
     if option == "1":
         # get host, user, password, database, type
@@ -426,6 +427,8 @@ def select_menu():
         take_all_backups()
         select_menu()
     elif option == "4":
+        print_all_configs()
+    elif option == "5":
         exit()
 
 
