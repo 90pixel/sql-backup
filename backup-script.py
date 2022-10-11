@@ -64,6 +64,7 @@ def read_do_config_file():
 def upload_to_digitalocean_spaces():
     try:
         client = Client(do_region_name, do_spaces_name, do_spaces_access_key, do_spaces_secret_key)
+        print("Uploading to DigitalOcean Spaces...")
         for file in os.listdir(backup_dir):
             if file.endswith(".gz"):
                 print("Uploading " + file)
@@ -74,6 +75,7 @@ def upload_to_digitalocean_spaces():
                 # remove file
                 os.remove(backup_dir + file)
     except Exception as e:
+        print(" Error uploading to DigitalOcean Spaces")
         print(e)
 
 
