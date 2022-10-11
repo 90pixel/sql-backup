@@ -282,6 +282,22 @@ def add_backup_arguments_to_config_file(_host, _user, _password, _database, _typ
     # if host is not set
     if _host == "":
         _host = "localhost"
+
+    # if type is mysql
+    if _type == "mysql":
+        # test mysql connection
+        test_mysql_connection(_host, _user, _password, _database)
+    # if type is mssql
+    elif _type == "mssql":
+        # test mssql connection
+        test_mssql_connection(_host, _user, _password, _database)
+    elif _type == "postgresql":
+        # test postgresql connection
+        test_postgresql_connection(_host, _user, _password, _database)
+    else:
+        print("Type is not valid")
+        exit()
+
     # Check if config file exists
     if not os.path.exists(config_file):
         # Add backup arguments to config file as list
@@ -292,21 +308,6 @@ def add_backup_arguments_to_config_file(_host, _user, _password, _database, _typ
         # Read config file
         with open(config_file) as json_file:
             data = json.load(json_file)
-
-            # if type is mysql
-            if _type == "mysql":
-                # test mysql connection
-                test_mysql_connection(_host, _user, _password, _database)
-            # if type is mssql
-            elif _type == "mssql":
-                # test mssql connection
-                test_mssql_connection(_host, _user, _password, _database)
-            elif _type == "postgresql":
-                # test postgresql connection
-                test_postgresql_connection(_host, _user, _password, _database)
-            else:
-                print("Type is not valid")
-                exit()
 
             # Add backup arguments to config file as list
             data.append({"host": _host, "user": _user, "password": _password, "database": _database, "type": _type})
