@@ -434,6 +434,7 @@ def select_menu():
 
 # STARTUP
 if len(sys.argv) > 1 and sys.argv[1] == "-backup":
+    check_do_config_file()
     take_all_backups()
 else:
     check_do_config_file()
