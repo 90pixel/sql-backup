@@ -159,7 +159,7 @@ def backup_postgresql(_host="", _user="", _password="", _database=""):
             _host = "localhost"
 
         # Dump database into SQL file
-        dumpcmd = "pg_dump --host=" + _host + " --username=" + _user + " --port=5432 " + _database + " > " + backup_file
+        dumpcmd = "pg_dump --dbname=postgresql://" + _user + ":" + _password + "@" + _host + ":5432/" + _database + ">" + backup_file
         os.system(dumpcmd)
 
         # Compress SQL file
