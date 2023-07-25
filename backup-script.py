@@ -70,7 +70,7 @@ def upload():
 def upload_to_ftp():
     try:
         session = ftplib.FTP(do_region_name, do_spaces_access_key, do_spaces_secret_key)
-        print("Uploading to DigitalOcean Spaces...")
+        print("Uploading to FTP...")
         for file in os.listdir(backup_dir):
             if file.endswith(".gz"):
                 print("Uploading " + file)
@@ -78,8 +78,13 @@ def upload_to_ftp():
                 file = open(backup_dir + file, 'rb')
                 session.storbinary('STOR backups/' + nb, file)
                 file.close()
-                session.quit()
-                os.remove(backup_dir + nb)
+        session.quit()
+        print("Good.. All files are uploaded!")
+        for file in os.listdir(backup_dir):
+            if file.endswith(".gz"):
+                print("Deleting " + file)
+                os.remove(backup_dir + file)
+
     except Exception as e:
         print("Error uploading to ftp:" + str(e))
         print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
