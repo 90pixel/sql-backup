@@ -2,8 +2,8 @@ import json
 import os
 import sys
 import time
+import ftplib
 from datetime import datetime, timezone
-
 from spaces import Client
 
 # CONSTANTS
@@ -59,6 +59,40 @@ def read_do_config_file():
         do_spaces_name = data['do_spaces_name']
         do_spaces_access_key = data['do_spaces_access_key']
         do_spaces_secret_key = data['do_spaces_secret_key']
+
+
+def upload():
+    if do_spaces_name == 'ftp':
+        return upload_to_ftp()
+    else:
+        upload_to_digitalocean_spaces()
+        # delete old backups from digitalocean spaces (3 months)
+        print("Start to remove old backups from DigitalOcean Spaces")
+        remove_old_s3()
+
+
+def upload_to_ftp():
+    try:
+        session = ftplib.FTP(do_region_name, do_spaces_access_key, do_spaces_secret_key)
+        print("Uploading to FTP...")
+        for file in os.listdir(backup_dir):
+            if file.endswith(".gz"):
+                print("Uploading " + file)
+                nb = file
+                file = open(backup_dir + file, 'rb')
+                session.storbinary('STOR backups/' + nb, file)
+                file.close()
+        session.quit()
+        print("Good.. All files are uploaded!")
+        for file in os.listdir(backup_dir):
+            if file.endswith(".gz"):
+                print("Deleting " + file)
+                os.remove(backup_dir + file)
+
+    except Exception as e:
+        print("Error uploading to ftp:" + str(e))
+        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
+    pass
 
 
 # UPLOAD TO DIGITALOCEAN SPACES
@@ -374,10 +408,7 @@ def take_all_backups():
         # remove old not compressed files
         remove_old_files()
         print("Start to upload backups")
-        upload_to_digitalocean_spaces()
-        # delete old backups from digitalocean spaces (3 months)
-        print("Start to remove old backups from DigitalOcean Spaces")
-        remove_old_s3()
+        upload()
     except Exception as e:
         print(e)
         print("Error: Something went wrong")
