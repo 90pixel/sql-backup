@@ -3,6 +3,7 @@ import os
 import sys
 import time
 import ftplib
+from datetime import datetime, timezone
 from spaces import Client
 
 # CONSTANTS
@@ -64,7 +65,10 @@ def upload():
     if do_spaces_name == 'ftp':
         return upload_to_ftp()
     else:
-        return upload_to_digitalocean_spaces()
+        upload_to_digitalocean_spaces()
+        # delete old backups from digitalocean spaces (3 months)
+        print("Start to remove old backups from DigitalOcean Spaces")
+        remove_old_s3()
 
 
 def upload_to_ftp():
@@ -270,6 +274,17 @@ def remove_old_files():
         os.system("find " + backup_dir + " -type f -name '*.sql' -exec rm {} \;")
 
 
+# REMOVE OLD FILES 3 MONTHS
+def remove_old_s3():
+    client = Client(do_region_name, do_spaces_name, do_spaces_access_key, do_spaces_secret_key)
+    print("Removing from DigitalOcean Spaces...")
+    for obj in client.list_files():
+        if obj["Key"].endswith(".gz"):
+            if (datetime.now(timezone.utc) - obj["LastModified"]).days > 90:
+                client.delete_file(file_path=obj["Key"], yes=True)
+                print("Removed " + obj["Key"])
+
+
 # CHECK DEPENDENCIES postgreSQL
 def check_dependencies_postgresql():
     # Check if pg_dump is installed
@@ -448,7 +463,8 @@ def select_menu():
     print("2. Remove Sql Backup Task")
     print("3. Start Backup Now")
     print("4. List All Backup Tasks")
-    print("5. Exit")
+    print("5. Delete Backups Older Than 3 Months")
+    print("6. Exit")
     option = input("Option: ")
     if option == "1":
         # get host, user, password, database, type
@@ -471,6 +487,8 @@ def select_menu():
     elif option == "4":
         print_all_configs()
     elif option == "5":
+        remove_old_s3()
+    elif option == "6":
         exit()
 
 
