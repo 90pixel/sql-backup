@@ -74,16 +74,18 @@ def upload_to_ftp():
         for file in os.listdir(backup_dir):
             if file.endswith(".gz"):
                 print("Uploading " + file)
-                file_name = file.split(".")[0]
+                nb = file
                 file = open(backup_dir + file, 'rb')
-                session.storbinary('STOR backups/'+ file_name, file)
+                session.storbinary('STOR backups/' + nb, file)
                 file.close()
+
                 session.quit()
                 os.remove(backup_dir + file)
     except Exception as e:
-        print("Error uploading to ftp")
-        print(e)
+        print("Error uploading to ftp:" + str(e))
+        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
     pass
+
 
 # UPLOAD TO DIGITALOCEAN SPACES
 def upload_to_digitalocean_spaces():
