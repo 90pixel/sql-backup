@@ -78,9 +78,8 @@ def upload_to_ftp():
                 file = open(backup_dir + file, 'rb')
                 session.storbinary('STOR backups/' + nb, file)
                 file.close()
-
                 session.quit()
-                os.remove(backup_dir + file)
+                os.remove(backup_dir + nb)
     except Exception as e:
         print("Error uploading to ftp:" + str(e))
         print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
