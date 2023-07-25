@@ -2,7 +2,7 @@ import json
 import os
 import sys
 import time
-
+import ftplib
 from spaces import Client
 
 # CONSTANTS
@@ -59,6 +59,31 @@ def read_do_config_file():
         do_spaces_access_key = data['do_spaces_access_key']
         do_spaces_secret_key = data['do_spaces_secret_key']
 
+
+def upload():
+    if do_spaces_name == 'ftp':
+        return upload_to_ftp()
+    else:
+        return upload_to_digitalocean_spaces()
+
+
+def upload_to_ftp():
+    try:
+        session = ftplib.FTP(do_region_name, do_spaces_access_key, do_spaces_secret_key)
+        print("Uploading to DigitalOcean Spaces...")
+        for file in os.listdir(backup_dir):
+            if file.endswith(".gz"):
+                print("Uploading " + file)
+                file_name = file.split(".")[0]
+                file = open(backup_dir + file, 'rb')
+                session.storbinary('STOR backups/'+ file_name, file)
+                file.close()
+                session.quit()
+                os.remove(backup_dir + file)
+    except Exception as e:
+        print("Error uploading to ftp")
+        print(e)
+    pass
 
 # UPLOAD TO DIGITALOCEAN SPACES
 def upload_to_digitalocean_spaces():
@@ -362,7 +387,7 @@ def take_all_backups():
         # remove old not compressed files
         remove_old_files()
         print("Start to upload backups")
-        upload_to_digitalocean_spaces()
+        upload()
     except Exception as e:
         print(e)
         print("Error: Something went wrong")
